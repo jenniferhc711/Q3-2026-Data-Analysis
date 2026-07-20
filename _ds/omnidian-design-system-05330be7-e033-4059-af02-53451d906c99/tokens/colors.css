@@ -1,0 +1,103 @@
+/* Omnidian — Color tokens
+   Core palette from Brand Guidelines v2.0 (Jan 2026). Scales derived
+   harmonically for UI states (hover/press/tints). */
+:root {
+  /* ---- Brand core ---- */
+  --carbon-blue: #28343f; /* primary dark — trust, stability */
+  --pulse-orange: #f26722; /* signature accent — forward energy */
+  --lumen-sand: #f2efec; /* warm neutral background */
+  --white: #ffffff;
+
+  /* ---- Secondary ---- */
+  --steel: #527db0; /* data viz, supporting UI */
+  --smoke: #5f7085; /* muted blue-grey */
+  --vivid-blue: #60c1e0; /* bright accent, callouts */
+  --vapor-gray: #f0f0f0; /* cool light surface */
+
+  /* ---- Carbon Blue scale ---- */
+  --carbon-50: #eef1f3;
+  --carbon-100: #d3d9de;
+  --carbon-200: #aab5bd;
+  --carbon-300: #7d8b96;
+  --carbon-400: #55646f;
+  --carbon-500: #3b4954;
+  --carbon-600: #28343f; /* base */
+  --carbon-700: #1f2931;
+  --carbon-800: #161d23;
+  --carbon-900: #0e1216;
+
+  /* ---- Pulse Orange scale ---- */
+  --orange-50: #fef1e9;
+  --orange-100: #fdd9c4;
+  --orange-200: #fabf99;
+  --orange-300: #f79e6b;
+  --orange-400: #f4823f;
+  --orange-500: #f26722; /* base */
+  --orange-600: #d9541a;
+  --orange-700: #b44315;
+  --orange-800: #8f3512;
+
+  /* ---- Neutral / sand scale ---- */
+  --sand-50: #faf9f7;
+  --sand-100: #f2efec; /* lumen sand */
+  --sand-200: #e7e2db;
+  --sand-300: #d8d2c8;
+  --sand-400: #c3bbae;
+  --vapor: #f0f0f0;
+
+  /* ---- Steel / blue supporting scale ---- */
+  --steel-300: #93b1d3;
+  --steel-500: #527db0;
+  --steel-700: #3c5d84;
+  --vivid-300: #9cd8ec;
+  --vivid-500: #60c1e0;
+
+  /* ==== Semantic aliases ==== */
+  --text-strong: var(--carbon-blue);
+  --text-body: #3d4a56;
+  --text-muted: var(--smoke);
+  --text-subtle: #8a97a3;
+  --text-inverse: var(--white);
+  --text-accent: var(--orange-600);
+
+  --surface-page: var(--white);
+  --surface-sand: var(--lumen-sand);
+  --surface-vapor: var(--vapor);
+  --surface-card: var(--white);
+  --surface-dark: var(--carbon-blue);
+  --surface-dark-2: var(--carbon-700);
+
+  --border-subtle: #e7e2db;
+  --border-default: #d8d2c8;
+  --border-strong: var(--carbon-200);
+  --border-dark: var(--carbon-500);
+
+  --accent: var(--pulse-orange);
+  --accent-hover: var(--orange-600);
+  --accent-press: var(--orange-700);
+  --accent-soft: var(--orange-50);
+  --focus-ring: rgba(242, 103, 34, 0.35);
+
+  --link: var(--orange-600);
+  --link-hover: var(--orange-700);
+
+  /* Status — info/warning map to palette; success & danger are
+     intentional additions (brand defines no green/red). */
+  --info: var(--steel-500);
+  --info-soft: #e8eff6;
+  --success: #2f8f6b;
+  --success-soft: #e4f2ec;
+  --warning: var(--orange-500);
+  --warning-soft: var(--orange-50);
+  --danger: #cc3d2e;
+  --danger-soft: #fbe9e7;
+
+  /* Gradient mesh — brand-forward moments (approximation of the
+     proprietary GRD mesh using core hues) */
+  --gradient-mesh: radial-gradient(120% 120% at 15% 20%, #f26722 0%, rgba(242,103,34,0) 45%),
+                   radial-gradient(120% 120% at 85% 15%, #60c1e0 0%, rgba(96,193,224,0) 50%),
+                   radial-gradient(140% 140% at 80% 90%, #527db0 0%, rgba(82,125,176,0) 55%),
+                   linear-gradient(135deg, #28343f 0%, #1f2931 100%); /* @kind color */
+  --gradient-warm: linear-gradient(120deg, #f26722 0%, #f4823f 60%, #f79e6b 100%); /* @kind color */
+  --gradient-cool: linear-gradient(120deg, #28343f 0%, #3c5d84 55%, #527db0 100%); /* @kind color */
+}

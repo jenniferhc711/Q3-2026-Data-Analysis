@@ -1,0 +1,15 @@
+/* Omnidian — Webfonts
+   The brand's primary typeface is Neue Haas Grotesk Display (licensed).
+   Per the brand owner, a close neo-grotesque substitute is accepted: we
+   self-host Hanken Grotesk (variable, SIL OFL) and register it UNDER the
+   brand family name so `--font-display` renders consistently everywhere.
+   If licensed Neue Haas files are added later, they take priority via the
+   local() lookup below. */
+@font-face {
+  font-family: "Neue Haas Grotesk Display";
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: local("Neue Haas Grotesk Display"), local("NeueHaasDisplay"),
+    url("../assets/fonts/hanken-grotesk-var.woff2") format("woff2");
+}
