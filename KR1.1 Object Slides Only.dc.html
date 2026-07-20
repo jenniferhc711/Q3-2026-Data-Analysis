@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/tokens/fonts.css">
+  <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/tokens/colors.css">
+  <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/tokens/typography.css">
+  <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/tokens/spacing.css">
+  <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/tokens/effects.css">
+  <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/styles.css">
+  <script src="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/_ds_bundle.js"></script>
+  <script src="./field-data.js"></script>
+  <style>
+    html, body { margin:0; padding:0; background:var(--surface-page); }
+  </style>
+</helmet>
+<div style="min-height:100vh;width:100%;background:var(--surface-page);font-family:var(--font-body);color:var(--text-body);box-sizing:border-box;">
+  <div style="display:flex;gap:10px;padding:20px 48px 0;flex-wrap:wrap;">
+    <sc-for list="{{ objects }}" as="obj" hint-placeholder-count="4">
+      <a href="{{ obj.href }}" style="text-decoration:none;padding:8px 16px;border-radius:999px;font-size:14px;font-weight:600;background:{{ obj.bg }};color:{{ obj.color }};border:1px solid var(--border-subtle);">{{ obj.name }}</a>
+    </sc-for>
+  </div>
+
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:20px 48px 0;flex-wrap:wrap;gap:16px;">
+    <div>
+      <div style="font-size:15px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-accent);font-weight:700;margin-bottom:8px;">Salesforce Object &middot; KR1.1</div>
+      <div style="font-size:38px;font-weight:700;color:var(--text-strong);letter-spacing:-0.02em;">{{ currentObject }}</div>
+    </div>
+    <div style="display:flex;gap:24px;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Analyzed</div>
+        <div style="font-size:28px;font-weight:700;color:var(--text-strong);line-height:1.1;margin-top:2px;">{{ currentStats.analyzed }}</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">NA &middot; &gt;25%</div>
+        <div style="font-size:28px;font-weight:700;color:var(--text-muted);line-height:1.1;margin-top:2px;">{{ currentStats.na }}</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Sign-off</div>
+        <div style="font-size:28px;font-weight:700;color:var(--danger);line-height:1.1;margin-top:2px;">{{ currentStats.deprecate }}</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Review</div>
+        <div style="font-size:28px;font-weight:700;color:var(--warning);line-height:1.1;margin-top:2px;">{{ currentStats.review }}</div>
+      </div>
+      <div>
+        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Keep</div>
+        <div style="font-size:28px;font-weight:700;color:var(--success);line-height:1.1;margin-top:2px;">{{ currentStats.keep }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="padding:16px 48px 56px;">
+    <dc-import name="ObjectSlide" object="{{ currentObject }}" style="width:100%;" hint-size="100%,900px"></dc-import>
+  </div>
+</div>
+
+</x-dc>
+<script type="text/x-dc" data-dc-script>
+const OBJECTS = ['Account', 'Contact', 'Lead', 'Opportunity'];
+
+class Component extends DCLogic {
+  state = { idx: 0 };
+
+  parseHash() {
+    const m = (location.hash || '').match(/^#(\d+)$/);
+    if (m) {
+      const i = parseInt(m[1], 10) - 1;
+      if (i >= 0 && i < OBJECTS.length) return i;
+    }
+    return 0;
+  }
+
+  componentDidMount() {
+    this.setState({ idx: this.parseHash() });
+    this._onHash = () => this.setState({ idx: this.parseHash() });
+    window.addEventListener('hashchange', this._onHash);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('hashchange', this._onHash);
+  }
+
+  renderVals() {
+    const idx = this.state.idx;
+    const currentObject = OBJECTS[idx];
+    const stats = (window.KR11_STATS && window.KR11_STATS[currentObject]) || { Deprecate: 0, Review: 0, Keep: 0 };
+    const totals = (window.KR11_ANALYZED_TOTALS && window.KR11_ANALYZED_TOTALS[currentObject]) || { analyzed: 0, na: 0 };
+    return {
+      currentObject,
+      currentStats: { analyzed: totals.analyzed, na: totals.na, deprecate: stats.Deprecate, review: stats.Review, keep: stats.Keep },
+      objects: OBJECTS.map((name, i) => ({
+        name,
+        href: '#' + (i + 1),
+        bg: i === idx ? 'var(--accent)' : 'var(--surface-card)',
+        color: i === idx ? '#fff' : 'var(--text-body)'
+      }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>
