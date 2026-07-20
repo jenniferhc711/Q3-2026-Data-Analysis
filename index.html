@@ -7,6 +7,7 @@
 </head>
 <body>
 <x-dc>
+
 <helmet>
   <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/tokens/fonts.css">
   <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/tokens/colors.css">
@@ -16,95 +17,199 @@
   <link rel="stylesheet" href="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/styles.css">
   <script src="_ds/omnidian-design-system-05330be7-e033-4059-af02-53451d906c99/_ds_bundle.js"></script>
   <script src="./field-data.js"></script>
-  <style>
-    html, body { margin:0; padding:0; background:var(--surface-page); }
-  </style>
 </helmet>
-<div style="min-height:100vh;width:100%;background:var(--surface-page);font-family:var(--font-body);color:var(--text-body);box-sizing:border-box;">
-  <div style="display:flex;gap:10px;padding:20px 48px 0;flex-wrap:wrap;">
-    <sc-for list="{{ objects }}" as="obj" hint-placeholder-count="4">
-      <a href="{{ obj.href }}" style="text-decoration:none;padding:8px 16px;border-radius:999px;font-size:14px;font-weight:600;background:{{ obj.bg }};color:{{ obj.color }};border:1px solid var(--border-subtle);">{{ obj.name }}</a>
-    </sc-for>
-  </div>
-
-  <div style="display:flex;justify-content:space-between;align-items:flex-start;padding:20px 48px 0;flex-wrap:wrap;gap:16px;">
-    <div>
-      <div style="font-size:15px;letter-spacing:0.08em;text-transform:uppercase;color:var(--text-accent);font-weight:700;margin-bottom:8px;">Salesforce Object &middot; KR1.1</div>
-      <div style="font-size:38px;font-weight:700;color:var(--text-strong);letter-spacing:-0.02em;">{{ currentObject }}</div>
-    </div>
-    <div style="display:flex;gap:24px;flex-wrap:wrap;">
-      <div>
-        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Analyzed</div>
-        <div style="font-size:28px;font-weight:700;color:var(--text-strong);line-height:1.1;margin-top:2px;">{{ currentStats.analyzed }}</div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">NA &middot; &gt;25%</div>
-        <div style="font-size:28px;font-weight:700;color:var(--text-muted);line-height:1.1;margin-top:2px;">{{ currentStats.na }}</div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Sign-off</div>
-        <div style="font-size:28px;font-weight:700;color:var(--danger);line-height:1.1;margin-top:2px;">{{ currentStats.deprecate }}</div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Review</div>
-        <div style="font-size:28px;font-weight:700;color:var(--warning);line-height:1.1;margin-top:2px;">{{ currentStats.review }}</div>
-      </div>
-      <div>
-        <div style="font-size:13px;font-weight:500;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);">Keep</div>
-        <div style="font-size:28px;font-weight:700;color:var(--success);line-height:1.1;margin-top:2px;">{{ currentStats.keep }}</div>
-      </div>
+<div style="width:100%;background:var(--surface-page);display:flex;flex-direction:column;font-family:var(--font-body);color:var(--text-body);box-sizing:border-box;">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;gap:24px;">
+    <x-import component-from-global-scope="OmnidianDesignSystem_05330b.Tabs" value="{{ tab }}" onChange="{{ setTab }}" items="{{ tabItems }}" hint-size="420px,44px"></x-import>
+    <div style="width:340px;flex-shrink:0;">
+      <x-import component-from-global-scope="OmnidianDesignSystem_05330b.Input" placeholder="Search field label or API name…" value="{{ search }}" onChange="{{ onSearchInput }}" hint-size="340px,44px"></x-import>
     </div>
   </div>
 
-  <div style="padding:16px 48px 56px;">
-    <dc-import name="ObjectSlide" object="{{ currentObject }}" style="width:100%;" hint-size="100%,900px"></dc-import>
+  <div style="border:1px solid var(--border-subtle);border-radius:12px;background:var(--surface-card);box-shadow:0 1px 3px rgba(40,52,63,0.08);">
+    <div style="max-height:70vh;overflow-y:auto;-webkit-overflow-scrolling:touch;touch-action:pan-y;">
+      <table style="width:100%;border-collapse:collapse;font-size:15px;table-layout:fixed;">
+        <thead style="position:sticky;top:0;background:var(--surface-sand);z-index:1;">
+          <tr>
+            <sc-if value="{{ isKeepTab }}" hint-placeholder-val="{{ false }}">
+              <th style="text-align:left;padding:14px 16px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:30%;">Field Label</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:12%;">Type</th>
+              <th style="text-align:right;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:10%;">Pop. %</th>
+              <th style="text-align:right;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:16%;">Records Populated</th>
+              <th style="text-align:left;padding:14px 16px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:32%;">Justification</th>
+            </sc-if>
+            <sc-if value="{{ isReviewTab }}" hint-placeholder-val="{{ false }}">
+              <th style="text-align:left;padding:14px 16px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:22%;">Field Label</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:9%;">Type</th>
+              <th style="text-align:right;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:8%;">Pop. %</th>
+              <th style="text-align:right;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:13%;">Records Populated</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:26%;">Justification</th>
+              <th style="text-align:left;padding:14px 16px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:22%;">Review With</th>
+            </sc-if>
+            <sc-if value="{{ isDeprecateTab }}" hint-placeholder-val="{{ true }}">
+              <th style="text-align:left;padding:14px 16px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:20%;">Field Label</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:8%;">Type</th>
+              <th style="text-align:right;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:7%;">Pop. %</th>
+              <th style="text-align:right;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:11%;">Records Populated</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:17%;">Justification</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:12%;">Updated Field Label</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:6%;">Added</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:6%;">Target Depr.</th>
+              <th style="text-align:left;padding:14px 12px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:8%;">Sign-Off Owner</th>
+              <th style="text-align:center;padding:14px 16px;font-size:12px;letter-spacing:0.06em;text-transform:uppercase;color:var(--text-muted);font-weight:600;width:5%;">Approved</th>
+            </sc-if>
+          </tr>
+        </thead>
+        <tbody>
+          <sc-for list="{{ rows }}" as="row" hint-placeholder-count="10">
+            <tr style="border-top:1px solid var(--border-subtle);">
+              <sc-if value="{{ isKeepTab }}" hint-placeholder-val="{{ false }}">
+                <td style="padding:12px 16px;font-weight:500;color:var(--text-strong);">{{ row.label }}</td>
+                <td style="padding:12px 12px;color:var(--text-muted);">{{ row.type }}</td>
+                <td style="padding:12px 12px;text-align:right;font-weight:600;">{{ row.popDisplay }}</td>
+                <td style="padding:12px 12px;text-align:right;color:var(--text-muted);">{{ row.recordsDisplay }}</td>
+                <td style="padding:12px 16px;color:var(--text-body);">{{ row.justification }}</td>
+              </sc-if>
+              <sc-if value="{{ isReviewTab }}" hint-placeholder-val="{{ false }}">
+                <td style="padding:12px 16px;font-weight:500;color:var(--text-strong);">{{ row.label }}</td>
+                <td style="padding:12px 12px;color:var(--text-muted);">{{ row.type }}</td>
+                <td style="padding:12px 12px;text-align:right;font-weight:600;">{{ row.popDisplay }}</td>
+                <td style="padding:12px 12px;text-align:right;color:var(--text-muted);">{{ row.recordsDisplay }}</td>
+                <td style="padding:12px 12px;color:var(--text-body);">{{ row.justification }}</td>
+                <td style="padding:12px 16px;"><input type="text" placeholder="Assign stakeholder…" value="{{ row.reviewWith }}" onChange="{{ row.onReviewWithChange }}" style="width:100%;border:1px solid var(--border-default);border-radius:6px;padding:6px 8px;font-size:14px;font-family:var(--font-body);color:var(--text-strong);box-sizing:border-box;" /></td>
+              </sc-if>
+              <sc-if value="{{ isDeprecateTab }}" hint-placeholder-val="{{ true }}">
+                <td style="padding:12px 16px;font-weight:500;color:var(--text-strong);">{{ row.label }}</td>
+                <td style="padding:12px 12px;color:var(--text-muted);">{{ row.type }}</td>
+                <td style="padding:12px 12px;text-align:right;font-weight:600;">{{ row.popDisplay }}</td>
+                <td style="padding:12px 12px;text-align:right;color:var(--text-muted);">{{ row.recordsDisplay }}</td>
+                <td style="padding:12px 12px;color:var(--text-body);">{{ row.justification }}</td>
+                <td style="padding:12px 12px;color:var(--text-body);">{{ row.updatedLabel }}</td>
+                <td style="padding:12px 12px;color:var(--text-muted);">{{ row.dateAdded }}</td>
+                <td style="padding:12px 12px;color:var(--text-muted);">{{ row.dateDeprecate }}</td>
+                <td style="padding:12px 12px;"><input type="text" placeholder="Assign owner…" value="{{ row.owner }}" onChange="{{ row.onOwnerChange }}" style="width:100%;border:1px solid var(--border-default);border-radius:6px;padding:6px 8px;font-size:14px;font-family:var(--font-body);color:var(--text-strong);box-sizing:border-box;" /></td>
+                <td style="padding:12px 16px;text-align:center;"><input type="checkbox" checked="{{ row.approved }}" onChange="{{ row.onApprovedChange }}" style="width:20px;height:20px;accent-color:var(--accent);cursor:pointer;" /></td>
+              </sc-if>
+            </tr>
+          </sc-for>
+        </tbody>
+      </table>
+      <sc-if value="{{ noResults }}" hint-placeholder-val="{{ false }}">
+        <div style="padding:60px;text-align:center;color:var(--text-muted);font-size:16px;">No fields match this filter.</div>
+      </sc-if>
+    </div>
   </div>
+
+  <div style="margin-top:14px;font-size:16px;color:var(--text-muted);">{{ resultCountLabel }}</div>
 </div>
 
 </x-dc>
-<script type="text/x-dc" data-dc-script>
-const OBJECTS = ['Account', 'Contact', 'Lead', 'Opportunity'];
-
+<script type="text/x-dc" data-dc-script data-props="{&quot;$preview&quot;:{&quot;width&quot;:1920,&quot;height&quot;:1080},&quot;object&quot;:{&quot;editor&quot;:&quot;enum&quot;,&quot;default&quot;:&quot;Account&quot;,&quot;tsType&quot;:&quot;string&quot;,&quot;options&quot;:[&quot;Account&quot;,&quot;Contact&quot;,&quot;Lead&quot;,&quot;Opportunity&quot;]}}">
 class Component extends DCLogic {
-  state = { idx: 0 };
+  state = { data: null, tab: 'Deprecate', search: '', signOff: {} };
 
-  parseHash() {
-    const m = (location.hash || '').match(/^#(\d+)$/);
-    if (m) {
-      const i = parseInt(m[1], 10) - 1;
-      if (i >= 0 && i < OBJECTS.length) return i;
-    }
-    return 0;
+  updateOwner(api, value) {
+    this.setState((s) => ({ signOff: { ...s.signOff, [api]: { ...s.signOff[api], owner: value } } }));
+  }
+
+  toggleApproved(api) {
+    this.setState((s) => ({ signOff: { ...s.signOff, [api]: { ...s.signOff[api], approved: !(s.signOff[api] && s.signOff[api].approved) } } }));
+  }
+
+  updateReviewWith(api, value) {
+    this.setState((s) => ({ signOff: { ...s.signOff, [api]: { ...s.signOff[api], reviewWith: value } } }));
   }
 
   componentDidMount() {
-    this.setState({ idx: this.parseHash() });
-    this._onHash = () => this.setState({ idx: this.parseHash() });
-    window.addEventListener('hashchange', this._onHash);
+    const obj = this.props.object || 'Account';
+    this.setState({
+      data: (window.KR11_FIELD_DATA && window.KR11_FIELD_DATA[obj]) || [],
+      stats: (window.KR11_STATS && window.KR11_STATS[obj]) || { Deprecate: 0, Review: 0, Keep: 0 },
+      analyzedTotals: (window.KR11_ANALYZED_TOTALS && window.KR11_ANALYZED_TOTALS[obj]) || { analyzed: 0, na: 0 }
+    });
   }
 
-  componentWillUnmount() {
-    window.removeEventListener('hashchange', this._onHash);
+  setTab = (v) => this.setState({ tab: v });
+  onSearchInput = (e) => this.setState({ search: e.target.value });
+
+  fmtPct(v) {
+    if (v == null) return '—';
+    return (Math.round(v * 10) / 10) + '%';
+  }
+
+  fmtNum(v) {
+    if (v == null) return '—';
+    return Math.round(v).toLocaleString('en-US');
   }
 
   renderVals() {
-    const idx = this.state.idx;
-    const currentObject = OBJECTS[idx];
-    const stats = (window.KR11_STATS && window.KR11_STATS[currentObject]) || { Deprecate: 0, Review: 0, Keep: 0 };
-    const totals = (window.KR11_ANALYZED_TOTALS && window.KR11_ANALYZED_TOTALS[currentObject]) || { analyzed: 0, na: 0 };
+    const object = this.props.object || 'Account';
+    const { data, stats, tab, search, signOff, analyzedTotals } = this.state;
+    const isDeprecateTab = tab === 'Deprecate';
+    const isReviewTab = tab === 'Review';
+    const isKeepTab = tab === 'Keep';
+
+    if (!data) {
+      return {
+        object, deprecateCount: '—', reviewCount: '—', keepCount: '—', isDeprecateTab, isReviewTab, isKeepTab,
+        analyzedCount: '—', naCount: '—',
+        tab, setTab: this.setTab, search, onSearchInput: this.onSearchInput,
+        tabItems: [{ value: 'Deprecate', label: 'Deprecate' }, { value: 'Review', label: 'Review' }, { value: 'Keep', label: 'Keep' }],
+        rows: [], noResults: false, resultCountLabel: 'Loading field data…'
+      };
+    }
+
+    const q = (search || '').trim().toLowerCase();
+    let filtered = data.filter((f) => f.action === tab);
+    if (q) filtered = filtered.filter((f) => f.label.toLowerCase().includes(q) || f.api.toLowerCase().includes(q));
+    filtered = filtered.slice().sort((a, b) => {
+      const ap = a.pop == null ? 9999 : a.pop;
+      const bp = b.pop == null ? 9999 : b.pop;
+      return ap - bp;
+    });
+
+    const rows = filtered.map((f) => ({
+      label: f.label || f.api,
+      type: f.type,
+      popDisplay: this.fmtPct(f.pop),
+      recordsDisplay: this.fmtNum(f.populated) + ' / ' + this.fmtNum(f.total),
+      justification: f.justification || '—',
+      updatedLabel: f.updatedLabel || '—',
+      dateAdded: f.dateAdded || '—',
+      dateDeprecate: f.dateDeprecate || '—',
+      owner: (signOff[f.api] && signOff[f.api].owner) || '',
+      approved: !!(signOff[f.api] && signOff[f.api].approved),
+      reviewWith: (signOff[f.api] && signOff[f.api].reviewWith) || '',
+      onOwnerChange: (e) => this.updateOwner(f.api, e.target.value),
+      onApprovedChange: () => this.toggleApproved(f.api),
+      onReviewWithChange: (e) => this.updateReviewWith(f.api, e.target.value)
+    }));
+
     return {
-      currentObject,
-      currentStats: { analyzed: totals.analyzed, na: totals.na, deprecate: stats.Deprecate, review: stats.Review, keep: stats.Keep },
-      objects: OBJECTS.map((name, i) => ({
-        name,
-        href: '#' + (i + 1),
-        bg: i === idx ? 'var(--accent)' : 'var(--surface-card)',
-        color: i === idx ? '#fff' : 'var(--text-body)'
-      }))
+      object,
+      isDeprecateTab,
+      isReviewTab,
+      isKeepTab,
+      analyzedCount: analyzedTotals.analyzed,
+      naCount: analyzedTotals.na,
+      deprecateCount: stats.Deprecate,
+      reviewCount: stats.Review,
+      keepCount: stats.Keep,
+      tab,
+      setTab: this.setTab,
+      search,
+      onSearchInput: this.onSearchInput,
+      tabItems: [
+        { value: 'Deprecate', label: 'Deprecate', count: stats.Deprecate },
+        { value: 'Review', label: 'Review', count: stats.Review },
+        { value: 'Keep', label: 'Keep', count: stats.Keep }
+      ],
+      rows,
+      noResults: rows.length === 0,
+      resultCountLabel: 'Showing ' + rows.length + ' of ' + stats[tab] + ' ' + tab.toLowerCase() + ' fields on ' + object
     };
   }
 }
-
 </script>
 </body>
 </html>
